@@ -13,5 +13,5 @@ The fire cactus can't be dodged without a double jump.
 
 ## Compiling
 
-To compile the project, run the compile.sh file.
+To compile the project, run the `compile.sh` file.
 You must have the SDL2 library (on linux: libsdl2-dev & libsdl2-image-dev)

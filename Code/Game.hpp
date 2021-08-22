@@ -44,6 +44,7 @@ class Game {
     
     bool quit;
     bool spaceBarPressed;
+    bool shiftPressed;
     
     int lastTime;
     int timeElapsed;
@@ -78,8 +79,6 @@ class Game {
     
     void spawnBarrier();
     
-    void handleInput();
-    
     void GraphicLog(const char *errorString);
     
     void collisionWithBarrier();
@@ -87,6 +86,16 @@ class Game {
     int setDrawColor(SDL_Renderer *renderer, Color color);
     
     int randInt(int a, int b);
+
+    // Input functions
+
+    void recordInput();
+
+    void handleInput();
+
+    void spaceBarFunction();
+
+    void shiftFunction();
   
 };
 

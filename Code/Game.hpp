@@ -27,6 +27,7 @@ class Game {
     SDL_Texture* playerTexture;
     SDL_Texture* cactusTexture;
     SDL_Texture* fireCactusTexture;
+    SDL_Texture* backgroundTexture;
     SDL_Event event;
     
     SDL_Texture* digitsTextures[10];
@@ -35,6 +36,8 @@ class Game {
     Color backgroundColor;
     Color playerColor;
     
+    Sprite background;
+
     Player m_player;
     
     std::vector<Barrier *> barriers;
@@ -62,6 +65,8 @@ class Game {
     void start();
     
     void setupSDL();
+
+    void loadTextures();
     
     void destroySDL();
     

@@ -9,7 +9,9 @@
 
 #include "Sprite.hpp"
 
-Sprite::Sprite(float x, float y, float width, float height): m_x(x), m_y(y), m_width(width), m_height(height), m_texture(NULL) {}
+Sprite::Sprite(float x, float y, float width, float height): m_x(x), m_y(y), m_width(width), m_height(height), m_texture(NULL) {
+  updateRect();
+}
 
 float Sprite::getX() const { return m_x; }
 float Sprite::getY() const { return m_y; }

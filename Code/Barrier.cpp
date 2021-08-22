@@ -5,6 +5,8 @@
  * @version 1.0
 */
 
+#include <SDL2/SDL.h>
+
 #include "Barrier.hpp"
 
 Barrier::Barrier(float x, float y, int width, int height, float speed, int scoreValue, int frameRate): Sprite(x, y, width, height), m_speed(speed), m_passed(false), m_scoreValue(scoreValue), gameFrameRate(frameRate) {}
@@ -19,7 +21,7 @@ void Barrier::move() {
 }
 
 bool Barrier::isVisible(int windowWdith) const {
-  return ((0 - m_width/2) < m_x && m_x < (windowWdith + m_width/2));
+  return ((0 - m_width/2) < m_x && m_x < (windowWdith + m_width)); // m_width and not m_width/2 to keep a "margin"
 }
 
 bool Barrier::hasPassed(int coordinate) const {

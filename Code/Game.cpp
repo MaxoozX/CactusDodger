@@ -23,7 +23,9 @@
 #include "Color.hpp"
 #include "Game.hpp"
 
-Game::Game(int windowWidth, int windowHeight, int frameRate, float constant_g, int numberOfScoreDigits, int barriersSpeed): window(NULL), renderer(NULL), playerTexture(NULL), cactusTexture(NULL), quit(false), lastTime(0), timeElapsed(0), timeToWait(0), backgroundColor(50, 50, 50), playerColor(0, 255, 0), m_player(windowWidth / 2, windowHeight - 60, 100, 100, frameRate, constant_g), spaceBarPressed(false), lastBarrierSpawned(0), score(0), jumpsSinceFloor(0), maxJumps(2), gameWindowWidth(windowWidth), gameWindowHeight(windowHeight), gameFrameRate(frameRate), scoreDigitsNumber(numberOfScoreDigits), waitTime(1000 / frameRate), gameBarriersSpeed(barriersSpeed)  {
+#define FLOOR_HEIGHT 50 // To add as property leter
+
+Game::Game(int windowWidth, int windowHeight, int frameRate, float constant_g, int numberOfScoreDigits, int barriersSpeed): window(NULL), renderer(NULL), playerTexture(NULL), cactusTexture(NULL), quit(false), lastTime(0), timeElapsed(0), timeToWait(0), backgroundColor(50, 50, 50), playerColor(0, 255, 0), m_player(windowWidth / 2, windowHeight - 50 - FLOOR_HEIGHT, 100, 100, frameRate, constant_g), background(windowWidth/2, windowHeight/2, windowWidth, windowHeight), spaceBarPressed(false), lastBarrierSpawned(0), score(0), jumpsSinceFloor(0), maxJumps(2), gameWindowWidth(windowWidth), gameWindowHeight(windowHeight), gameFrameRate(frameRate), scoreDigitsNumber(numberOfScoreDigits), waitTime(1000 / frameRate), gameBarriersSpeed(barriersSpeed) {
 }
 
 void Game::start() {
@@ -79,9 +81,11 @@ void Game::start() {
     spawnBarrier(); // Maybe
     
     checkForPlayerCollision();
-    
+
     setDrawColor(renderer, backgroundColor);
     SDL_RenderClear(renderer);
+
+    background.draw(renderer);
     
     moveBarriersAndRemoveIfNeeded();
     
@@ -113,21 +117,7 @@ void Game::setupSDL() {
   
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
 
-  playerTexture = IMG_LoadTexture(renderer, "Textures/Player/player-square.png");
-  cactusTexture = IMG_LoadTexture(renderer, "Textures/Obstacles/cactus.png");
-  fireCactusTexture = IMG_LoadTexture(renderer, "Textures/Obstacles/fire-cactus.png");
-  
-  m_player.setTexture(playerTexture);
-  
-  char string[22];
-  
-  for(int i(0); i<10; i++) {
-    sprintf(string, "Textures/Digits/%d.png", i);
-    digitsTextures[i] = IMG_LoadTexture(renderer, string);
-    if(digitsTextures[i] == NULL) {
-      SDL_Log("Problem loading texture of number : %d", i);
-    }
-  }
+  loadTextures();
   
   for(int i(0); i<scoreDigitsNumber; i++) {
     SDL_Rect new_rect;
@@ -138,6 +128,38 @@ void Game::setupSDL() {
     digitsRect.push_back(new_rect);
   }
   
+}
+
+void Game::loadTextures() {
+  playerTexture = IMG_LoadTexture(renderer, "Textures/Player/player-square.png");
+  if(playerTexture == NULL) {
+    SDL_Log("Problem loading player texture : %s", IMG_GetError());
+  }
+  cactusTexture = IMG_LoadTexture(renderer, "Textures/Obstacles/cactus.png");
+  if(cactusTexture == NULL) {
+    SDL_Log("Problem loading cactus texture : %s", IMG_GetError());
+  }
+  fireCactusTexture = IMG_LoadTexture(renderer, "Textures/Obstacles/fire-cactus.png");
+  if(fireCactusTexture == NULL) {
+    SDL_Log("Problem loading fire cactus texture : %s", IMG_GetError());
+  }
+  backgroundTexture = IMG_LoadTexture(renderer, "Textures/Background/background.png");
+  if(backgroundTexture == NULL) {
+    SDL_Log("Problem loading background texture : %s", IMG_GetError());
+  }
+
+  m_player.setTexture(playerTexture);
+  background.setTexture(backgroundTexture);
+  
+  char string[22];
+  
+  for(int i(0); i<10; i++) {
+    sprintf(string, "Textures/Digits/%d.png", i);
+    digitsTextures[i] = IMG_LoadTexture(renderer, string);
+    if(digitsTextures[i] == NULL) {
+      SDL_Log("Problem loading texture of number %d : %s", i, IMG_GetError());
+    }
+  }
 }
 
 void Game::destroySDL() {
@@ -244,7 +266,7 @@ void Game::drawNumberOnScreen(int number) {
 }
 
 void Game::spawnBarrier() {
-  if(lastBarrierSpawned >= 50) { // 50 seems OK
+  if(lastBarrierSpawned >= 2 * gameFrameRate) { // Seems alright
     if(rand() % 20 < 1){
       
       int height = 0;
@@ -266,7 +288,7 @@ void Game::spawnBarrier() {
         lastBarrierSpawned = 0;
         barrierTexture = cactusTexture;
       }
-      Barrier* new_barrier = new Barrier(1000, gameWindowHeight - height/2 - 10, width, height, gameBarriersSpeed, scoreVal, gameFrameRate);
+      Barrier* new_barrier = new Barrier(gameWindowWidth+width, gameWindowHeight - height/2 - FLOOR_HEIGHT, width, height, gameBarriersSpeed, scoreVal, gameFrameRate);
       new_barrier->setTexture(barrierTexture);
       barriers.push_back(new_barrier);
     }
